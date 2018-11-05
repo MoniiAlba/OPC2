@@ -15,6 +15,9 @@ texto      BYTE "El coronel no tiene "
 conul      BYTE "enur"        ; caracteres a contabilizar
 acont      DWORD 4 DUP (?)       ; total de cada carácter
 
+;VAriables locales de proceso longitud
+dirRet DWORD ?
+
 
 .CODE
 main PROC
@@ -23,7 +26,20 @@ main PROC
 main ENDP
 
 longitud PROC
+ pop dirRet
+ pop esi ;direccion de string 
+ mov edi , 0 ; indice
+ cmp BYTE PTR [esi],0
+.WHILE ZERO?
+ call DumpRegs
+ add edi , 4
+ cmp BYTE PTR [esi+edi],0
+.ENDW
+ 
 
+
+ push dirRet
+ RET
 
 longitud ENDP
 

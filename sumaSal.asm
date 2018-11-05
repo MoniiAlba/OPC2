@@ -33,26 +33,26 @@ main PROC
     call Gotoxy
     
     mov edx,OFFSET mensajeN
+    ;call DumpRegs
     call WriteString
     call ReadInt
     call Crlf
 
 
     .IF (n >= 1)
-        mov  DL,14  ;column
-        mov  DH,8  ;row
+
         
+        call salario
+
         
-        call Gotoxy
-        
-        CALL Salarios
-        call dumpRegs
+        call DumpRegs
         mov edx, OFFSET mensajeTot
         call WriteString
         mov eax, sumaAcum
         call WriteInt
+        
     .ENDIF
-    
+    exit
 main ENDP
 
     Salarios PROC
@@ -60,19 +60,26 @@ main ENDP
         mov ecx, 1
         
 
-        .WHILE ecx <= n
-                                  
-            call Possal
-            call ReadInt
-            call Crlf 
-
-            ADD   sumaAcum, eax           
-            inc ecx
-
-         .ENDW
-
-        RET        
+ ;         .WHILE ecx <= n
+ ;                                   
+ ;             call Possal
+ ;             call ReadInt
+ ;             call Crlf 
+ ; 
+ ;             ADD   sumaAcum, eax           
+ ;             inc ecx
+ ; 
+ ;          .E
+        ;call dumpregs
+        RET
+        
     Salarios ENDP
+
+
+    salario PROC
+        call DumpRegs
+        RET
+    salario ENDP
         
     Possal PROC
         mov  DL,14
