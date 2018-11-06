@@ -1,4 +1,4 @@
-TITLE *MASM Template	(tarea2Clase2.asm)*
+TITLE *MASM Template	(tarea2Clase2b.asm)*
 
 ; Descripcion:
 ; Mi primer programa.
@@ -26,12 +26,22 @@ msgPAR BYTE " P",0
 msgIm BYTE " I",0
 msgBye  BYTE "ADIOS.",0
 msgInv  BYTe    "Inviertiendo arreglo",0
+msgVivo BYTE    "Cambio", 0
 
 n SDWORD ?
 temp SDWORD 10 dup(?)
 indice DWORD 1
 nc DWORD ?
 vc SDWORD 0
+
+
+;variables locales para VecSelDir
+tam DWORD ?
+tam2 DWORD ?
+indice1 DWORD ?
+indice2 DWORD ?
+arr SDWORD ?
+retDir DWORD ?
 
 
 
@@ -98,28 +108,20 @@ main PROC
         call Crlf
 
         ;para ordenar el arreglo de menor a mayor con algoritmo dado
-        mov edi, 0 ;primer indice (ind1)
-        mov ebx, 0 ;segundo indice (ind2)
-
-        .WHILE edi < n-1
-            mov ebx, edi
-            inc ebx
-            .WHILE ebx < n
-                mov esi, temp[ebx*4]
-                .IF SDWORD PTR temp[edi*4] > SDWORD PTR esi
-                    mov eax, temp[ebx*4]
-                    xchg eax, temp[edi*4]
-                    mov temp[ebx*4], eax
-                .ENDIF
-                inc ebx
-            .ENDW
-            inc edi
-        .ENDW
+        ;usando procedimiento VecSelDir
+        push n
+        push 0
+        push 0
+        push OFFSET temp
+            
+        
         call Crlf
         mov edx, OFFSET msgInv
         call WriteString
         call Crlf
         
+        call VecSelDir
+       
         mov ESI, OFFSET temp
         mov ECX, n
         mov EBX, 4
@@ -147,46 +149,6 @@ main PROC
         
         
 
-        ;para imprimir al reves
-         ; mov eax, n
- ;         dec eax
- ;         mov ecx, 4
- ;         mul ecx
- ;         mov ecx, eax  ;indice
- ; 
- ;         .WHILE SDWORD PTR ecx >= 0
- ;             
- ;             mov edx, OFFSET msgT
- ;             call WriteString
- ;             mov eax, ecx
- ;             sub edx, edx
- ;             mov ebx, 4
- ;             div ebx
- ;             inc eax
- ;             call WriteInt
- ;             and eax, 1
- ;             .IF ZERO? 
- ;                 mov  esi, OFFSET msgPAR
- ;             .ELSE
- ;                 mov  esi, OFFSET msgIm
- ;             .ENDIF
- ; 
- ;             mov edx, OFFSET msgP
- ;             call WriteString
- ;             ;mov eax, [temp+ecx]
- ;             pop eax
- ;             call WriteInt
- ;             mov edx, OFFSET msgC
- ;             call WriteString
- ;             inc eax
- ; 
- ;             mov  edx, esi
- ;             call WriteString
- ; 
- ;             call Crlf
- ;             sub ecx, 4
- ; 
- ;         .ENDW
           call Crlf
           mov edx, OFFSET msgBye
           call WriteString
@@ -206,7 +168,40 @@ main PROC
     
     exit
 main ENDP
-; Termina el procedimiento principal
 
-; Termina el area de Ensamble
+    VecSelDir PROC
+        pop retDir
+        
+        pop ecx    ;arreglo
+        pop ebx    ;indice2
+        pop edi    ;indice1
+        pop tam
+
+        mov eax, tam
+        mov tam2, eax
+        dec tam2
+        
+        .WHILE SDWORD PTR edi < tam2
+
+            mov ebx, edi
+            inc ebx
+            
+            
+            .WHILE SDWORD PTR ebx < tam
+                mov esi, [ecx + ebx*4]
+                
+                .IF SDWORD PTR [ecx +edi*4] > SDWORD PTR esi
+                    mov eax, [ecx + ebx*4]
+                    xchg eax, [ecx + edi*4]
+                    mov [ecx +ebx*4], eax
+                .ENDIF
+                inc ebx
+            .ENDW
+            inc edi
+        .ENDW
+
+        push retDir
+        RET
+    VecSelDir ENDP
+
 END main
