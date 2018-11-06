@@ -13,7 +13,7 @@ texto      BYTE "El coronel no tiene "
            BYTE "quien le escriba." 
            BYTE  0
 conul      BYTE "enur"        ; caracteres a contabilizar
-acont      DWORD 4 DUP (?)       ; total de cada carácter
+acont      DWORD 4 DUP (0)       ; total de cada carï¿½cter
 mssgLongitud BYTE "Longitud del string: ",0
 longitudRes SDWORD ?
 
@@ -26,6 +26,10 @@ msgTxt BYTE "Texto: ",0
 msgLng BYTE "    Longitud: ",0
 msgCar BYTE " caracteres",0
 
+;Variables imprimeCta
+msgC BYTE "Caracter",0
+msgCtd BYTE "cantidad",0
+
 
 .CODE
 main PROC
@@ -35,6 +39,29 @@ main PROC
     push longitudRes
     push OFFSET texto
     call imprimeT
+    call Crlf
+
+    ;FUNCION cuenta letras
+    push OFFSET acont
+    push longitudRes
+    push OFFSET conul
+    push OFFSET texto
+    ;mov eax , acont[0]
+    ;call WriteInt
+    call ctaenur
+    call Crlf
+
+    ;mov eax , acont
+    ;call WriteInt
+    ;call Crlf
+    ;mov eax, acont[4]
+    ;call WriteInt
+    ;Imprime tabla de caracteres
+    push OFFSET acont
+    push OFFSET conul
+    call imprimeCta
+    call Crlf
+    
     
 
     exit
@@ -81,18 +108,23 @@ ctaenur PROC
  pop edi ;Direccion del arreglo de letras a buscar
  pop eax ;Longitud del string
  pop edx ;Arreglo acont
- mov ebx, 0
+ mov ebx, 0 ;indice
+
+
 
  .WHILE ebx < eax
    mov cl, [esi+ebx] ; elemento actual
    .IF cl == [edi]
-     inc [edx]
+     inc DWORD PTR [edx]
    .ELSEIF cl == [edi+1]
-     inc [edx+1]
-   
+     inc DWORD PTR [edx+4]
+    .ELSEIF cl == [edi+2]
+     inc DWORD PTR [edx+8]
+    .ELSEIF cl == [edi+1]
+     inc DWORD PTR [edx+12]
    .ENDIF
      
- 
+  inc ebx
  .ENDW
 
  push dirRet
@@ -100,9 +132,43 @@ ctaenur PROC
 
 ctaenur ENDP
 
-ejem PROC
-    call DumpRegs
-    RET
-ejem ENDP
+imprimeCta PROC
+  pop dirRet
+  pop esi ; direccion conul
+  pop edi ; direccion acont
+  
+  mov dl , 20
+  mov dh, 5
+  call Gotoxy
+  mov edx, OFFSET msgC
+  call WriteString
+
+  mov dl , 40
+  mov dh, 5
+  call Gotoxy
+  mov edx, OFFSET msgCtd
+  call WriteString
+
+  ;imprime letras
+  mov ecx, 0
+  mov ebx, 5
+  .WHILE ecx < 4
+    add ebx,3
+    mov dl , 15
+    mov dh, bl
+    call Gotoxy
+    mov al, [esi+ecx]
+    call WriteChar
+
+    mov dl , 45
+    mov dh, bl
+    call Gotoxy
+    mov eax, [edi+ecx*4]
+    call WriteInt
+    inc ecx
+  .ENDW
+
+  push dirRet
+imprimeCta ENDP
 
 END main
