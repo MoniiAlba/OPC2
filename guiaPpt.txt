@@ -1,0 +1,13 @@
+BA: "type" PTR
+BB: multiplicacion y division
+BC: jmp condicional e incondicional
+BD1: como funciona ensamblador
+BD2: basicos reads y writes
+BE: cmp con y sin signo
+BF: if, while, do-while con jmp y cmp
+BG: direccionamientos
+BH: and, or, xor
+BI1: expresiones compuestas
+BI2: macros
+BK: stack
+BL: procedimientos
