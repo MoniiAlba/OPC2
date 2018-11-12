@@ -11,10 +11,11 @@ includelib \masm32\Irvine\Kernel32.lib
 n    SDWORD ?
 prim    DWORD 0
 sec    DWORD 1
-
+acum    DWORD 1
 texto    BYTE "Acumulado: ",0
 textoNel   BYTE "N debe ser positiva",0
 textoN   BYTE "Ingresa n: ",0
+txtBye  BYTE "ADIOS!",0
 
 .CODE
 ; Procedimiento principal
@@ -35,9 +36,13 @@ main PROC
         call WriteInt
         call Crlf
         .WHILE n >=1
-            mov ebx, sec
-            mov prim, ebx
+            mov ebx, prim
+            mov ecx, sec
             add sec, ebx
+            mov prim, ecx
+            mov ebx, sec
+            add acum, ebx
+            
             mov eax, sec
             call WriteInt
             call Crlf
@@ -45,6 +50,12 @@ main PROC
 
         .ENDW
         mov edx, OFFSET texto
+        call WriteString
+        mov eax, acum
+        call WriteInt
+        call Crlf
+
+        mov edx, OFFSET txtBye
         call WriteString
         call Crlf
 
