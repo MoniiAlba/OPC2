@@ -29,11 +29,13 @@ alpha   REAL8 ?
 dirRetM  DWORD ?
 tam     DWORD ?
 min     REAL8 ?
+minInd  DWORD ?
 
 
 ;Para Imprime
 dirRetI DWORD ?
 m       DWORD ?
+saca    Real8 ?
 
 msgFactor   BYTE    "Ingrese factor: ",0
 msgErrorF   BYTE    "Factor Debe de ser un entero entre 0 y 9",0
@@ -43,6 +45,8 @@ msgLeeList  BYTE    "Ingrese el ",0
 msgLista    BYTE    " elemento de la lista: ",0
 msgElem     BYTE    "Elemento ",0
 msgDP       BYTE	  ": ",0
+msgMinVal   BYTE    "Valor minimo: ",0
+msgMinInd   BYTE    "Indice del minimo: ",0
 
 .CODE
 main PROC
@@ -82,11 +86,26 @@ main PROC
             push OFFSET arreglo
             push N
             call MenorLista
+            ;fstp min
+            pop minInd
+            call Crlf
+            mov edx, OFFSET msgMinVal
+            call WriteString
+            call WriteFloat
+            fstp min
+            call Crlf
+            mov edx, OFFSET msgMinInd
+            call WriteString
+            mov eax, minInd
+            call WriteInt
+            call Crlf
 
             
             push OFFSET arreglo
             push N
             call Imprime
+
+            call ShowFPUStack
         .ENDIF
 
 
@@ -145,9 +164,26 @@ main ENDP
 
     MenorLista PROC
         pop dirRetM
-        pop tam
-
-        
+        pop num
+        pop esi  ;offset arr
+        mov ecx,0
+        mov edi, 0 ;min index
+        .WHILE ecx < num
+            pushfd
+            fld REAL8 PTR [esi + (ecx*8)]
+            fcomp REAL8 PTR [esi + (edi*8)]
+            fnstsw ax ; move status word into AX
+            sahf ; copy AH into EFLAGS
+            jnb L1
+            mov edi, ecx 
+        L1:
+            popfd
+            inc ecx
+        .ENDW
+        ; mov eax, edi
+        ; call WriteInt
+        push edi; indice del val min
+        fld REAL8 PTR [esi + (edi*8)] ; val min
 
         push dirRetM
         RET
@@ -169,6 +205,7 @@ main ENDP
             call WriteString
             FLD REAL8 PTR [esi + ecx*8]
             call WriteFloat
+            fstp saca
             call Crlf
             inc ecx
         .ENDW
